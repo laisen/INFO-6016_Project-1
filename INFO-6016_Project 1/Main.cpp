@@ -13,7 +13,6 @@ int main(int argc, char** argv)
 	std::cout << MyBuffer.readUInt32BE(0) << std::endl;
 	std::cout << MyBuffer.readStringBE(4) << std::endl;
 	std::cout << MyBuffer.readShortBE(strlen("Hello") + 4) << std::endl;
-	std::cout << sizeof(int) << std::endl;
 	
 
 	system("Pause");

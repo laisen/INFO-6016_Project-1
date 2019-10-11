@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <string>
 #include <iostream>
+#include "cBuffer.h"
 
 // Need to link with Ws2_32.lib
 #pragma comment (lib, "Ws2_32.lib")
@@ -167,11 +168,17 @@ int main(void)
 			std::cout << "Client disconnected " << std::endl;
 			break;
 		}
+		cBuffer recvBuffer;
 
-		std::cout << std::string(buf, 0, bytesReceived) << std::endl;
+		recvBuffer.writeStringBE(0, std::string(buf, 0, bytesReceived));
+
+		//std::cout << std::string(buf, 0, bytesReceived) << std::endl;
+		std::cout << recvBuffer.readStringBE(0) << std::endl;
 
 		// Echo message back to client
-		send(ClientSocket, buf, bytesReceived + 1, 0);
+		std::string bufferToString;
+		bufferToString.insert(bufferToString.begin(), recvBuffer._buffer.begin(), recvBuffer._buffer.end());
+		send(ClientSocket, bufferToString.c_str(), bufferToString.size(), 0);
 
 	}
 

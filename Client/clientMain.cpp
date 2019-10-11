@@ -7,11 +7,10 @@
 #include <stdio.h>
 #include <string>
 #include <iostream>
+#include "cBuffer.h"
 
 // Need to link with Ws2_32.lib, Mswsock.lib, and Advapi32.lib
 #pragma comment (lib, "Ws2_32.lib")
-//#pragma comment (lib, "Mswsock.lib")
-//#pragma comment (lib, "AdvApi32.lib")
 
 
 #define DEFAULT_BUFLEN 512
@@ -115,8 +114,14 @@ int main(int argc, char** argv)
 
 		if (userInput.size() > 0)		// Make sure the user has typed in something
 		{
+			cBuffer sendBuffer;
+			sendBuffer.writeStringBE(0, userInput);
+			std::string bufferToString;
+			bufferToString.insert(bufferToString.begin(), sendBuffer._buffer.begin(), sendBuffer._buffer.end());
+			
 			// Send the text
-			int sendResult = send(ConnectSocket, userInput.c_str(), userInput.size() + 1, 0);
+			//int sendResult = send(ConnectSocket, userInput.c_str(), userInput.size() + 1, 0);
+			int sendResult = send(ConnectSocket, bufferToString.c_str(), bufferToString.size(), 0);
 			if (sendResult != SOCKET_ERROR)
 			{
 				// Wait for response
@@ -124,8 +129,10 @@ int main(int argc, char** argv)
 				int bytesReceived = recv(ConnectSocket, buf, 4096, 0);
 				if (bytesReceived > 0)
 				{
+					cBuffer recvBuffer;
+					recvBuffer.writeStringBE(0, std::string(buf, 0, bytesReceived));
 					// Echo response to console
-					std::cout << "SERVER> " << std::string(buf, 0, bytesReceived) << std::endl;
+					std::cout << "SERVER> " << recvBuffer.readStringBE(0) << std::endl;
 				}
 			}
 		}

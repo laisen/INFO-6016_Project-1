@@ -123,7 +123,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="cBuffer.cpp" />
     <ClCompile Include="serverMain.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="cBuffer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
