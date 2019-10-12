@@ -26,5 +26,8 @@
     <ClInclude Include="..\INFO-6016_Project 1\cBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="cProtocol.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

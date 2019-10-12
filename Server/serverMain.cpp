@@ -170,15 +170,31 @@ int main(void)
 		}
 		cBuffer recvBuffer;
 
-		recvBuffer.writeStringBE(0, std::string(buf, 0, bytesReceived));
+		recvBuffer._buffer.resize(8);
+		recvBuffer._buffer[0] = buf[0];
+		recvBuffer._buffer[1] = buf[1];
+		recvBuffer._buffer[2] = buf[2];
+		recvBuffer._buffer[3] = buf[3];
+		recvBuffer._buffer[4] = buf[4];
+		recvBuffer._buffer[5] = buf[5];
+		recvBuffer._buffer[6] = buf[6];
+		recvBuffer._buffer[7] = buf[7];
+		//std::string stringToBuffer;
+		//stringToBuffer = buf;
+		//recvBuffer._buffer.insert(recvBuffer._buffer.begin(), stringToBuffer.begin(), stringToBuffer.end());
 
-		//std::cout << std::string(buf, 0, bytesReceived) << std::endl;
-		std::cout << recvBuffer.readStringBE(0) << std::endl;
+		//recvBuffer.writeStringBE(0, std::string(buf, 0, bytesReceived));
+
+		std::cout << recvBuffer.readUInt32BE(0) << std::endl;
+		std::cout << recvBuffer.readUInt32BE(4) << std::endl;
+		std::cout << std::string(buf, 0, bytesReceived) << std::endl;
+		//std::cout << recvBuffer.readStringBE(0) << std::endl;
 
 		// Echo message back to client
-		std::string bufferToString;
-		bufferToString.insert(bufferToString.begin(), recvBuffer._buffer.begin(), recvBuffer._buffer.end());
-		send(ClientSocket, bufferToString.c_str(), bufferToString.size(), 0);
+		//std::string bufferToString;
+		//bufferToString.insert(bufferToString.begin(), recvBuffer._buffer.begin(), recvBuffer._buffer.end());
+		//send(ClientSocket, bufferToString.c_str(), bufferToString.size(), 0);
+		send(ClientSocket, "ok", 2, 0);
 
 	}
 
@@ -194,6 +210,6 @@ int main(void)
 	// cleanup
 	closesocket(ClientSocket);
 	WSACleanup();
-
+	system("Pause");
 	return 0;
 }

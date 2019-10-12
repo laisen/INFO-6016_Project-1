@@ -8,6 +8,7 @@
 #include <string>
 #include <iostream>
 #include "cBuffer.h"
+#include "cProtocol.h"
 
 // Need to link with Ws2_32.lib, Mswsock.lib, and Advapi32.lib
 #pragma comment (lib, "Ws2_32.lib")
@@ -20,8 +21,8 @@ int main(int argc, char** argv)
 {
 	WSADATA wsaData;
 	SOCKET ConnectSocket = INVALID_SOCKET;
-	struct addrinfo *result = NULL,	*ptr = NULL, hints;
-	const char *sendbuf = "this is a test";
+	struct addrinfo* result = NULL, * ptr = NULL, hints;
+	const char* sendbuf = "this is a test";
 	char recvbuf[DEFAULT_BUFLEN];
 	int iResult;
 	int recvbuflen = DEFAULT_BUFLEN;
@@ -106,6 +107,15 @@ int main(int argc, char** argv)
 	char buf[4096];
 	std::string userInput;
 
+	std::string str;
+	cBuffer Buffer;
+	Buffer = JoinRoom("room#1", "Sen");
+	str.insert(str.begin(), Buffer._buffer.begin(), Buffer._buffer.end());
+	std::cout << Buffer.readUInt32BE(0) << std::endl;
+	std::cout << Buffer.readUInt32BE(4) << std::endl;
+	std::cout << Buffer.readUInt32BE(8) << std::endl;
+	std::cout << Buffer.readUInt32BE(18) << std::endl;
+	iResult = send(ConnectSocket, str.c_str(), str.size(), 0);
 	do
 	{
 		// Prompt the user for some text
@@ -114,14 +124,14 @@ int main(int argc, char** argv)
 
 		if (userInput.size() > 0)		// Make sure the user has typed in something
 		{
-			cBuffer sendBuffer;
-			sendBuffer.writeStringBE(0, userInput);
-			std::string bufferToString;
-			bufferToString.insert(bufferToString.begin(), sendBuffer._buffer.begin(), sendBuffer._buffer.end());
-			
+			//cBuffer sendBuffer;
+			//sendBuffer.writeStringBE(0, userInput);
+			//std::string bufferToString;
+			//bufferToString.insert(bufferToString.begin(), sendBuffer._buffer.begin(), sendBuffer._buffer.end());
+
 			// Send the text
-			//int sendResult = send(ConnectSocket, userInput.c_str(), userInput.size() + 1, 0);
-			int sendResult = send(ConnectSocket, bufferToString.c_str(), bufferToString.size(), 0);
+			int sendResult = send(ConnectSocket, userInput.c_str(), userInput.size() + 1, 0);
+			//int sendResult = send(ConnectSocket, bufferToString.c_str(), bufferToString.size(), 0);
 			if (sendResult != SOCKET_ERROR)
 			{
 				// Wait for response
@@ -129,10 +139,10 @@ int main(int argc, char** argv)
 				int bytesReceived = recv(ConnectSocket, buf, 4096, 0);
 				if (bytesReceived > 0)
 				{
-					cBuffer recvBuffer;
-					recvBuffer.writeStringBE(0, std::string(buf, 0, bytesReceived));
+					//cBuffer recvBuffer;
+					//recvBuffer.writeStringBE(0, std::string(buf, 0, bytesReceived));
 					// Echo response to console
-					std::cout << "SERVER> " << recvBuffer.readStringBE(0) << std::endl;
+					std::cout << "SERVER> " << /*recvBuffer.readStringBE(0) << */std::endl;
 				}
 			}
 		}
