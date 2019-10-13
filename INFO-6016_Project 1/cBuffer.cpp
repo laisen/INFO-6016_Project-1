@@ -36,8 +36,7 @@ void cBuffer::writeStringBE(std::size_t index, std::string value)
 	_buffer.resize(_buffer.size() + value.length());
 	for (int stringIndex = 0; stringIndex < value.length(); stringIndex++)
 	{
-		_buffer[index + stringIndex] = value[stringIndex];
-		//printf("buffer %d write %s\n", stringIndex, std::bitset<8>(_buffer[stringIndex]).to_string().c_str());
+		_buffer[index + stringIndex] = value[stringIndex];		
 	}
 
 	return;
@@ -65,15 +64,14 @@ short cBuffer::readShortBE(std::size_t index)
 	return value;
 }
 
-std::string cBuffer::readStringBE(std::size_t index)
+std::string cBuffer::readStringBE(std::size_t index, int strlen)
 {
 	std::string value;
-	value.resize(_buffer.size() - index + 1);
-	for (int bufferIndex = 0; bufferIndex < _buffer.size() - index; bufferIndex++)
+	value.resize(strlen);
+	for (int strIndex = 0; strIndex < strlen; strIndex++)
 	{
-		value[bufferIndex] = _buffer[index + bufferIndex];
-		//printf("value %d read %s\n", bufferIndex, std::bitset<8>(value[bufferIndex]).to_string().c_str());
+		value[strIndex] = _buffer[index + strIndex];
 	}
-	
+
 	return value;
 }

@@ -1,2 +1,10 @@
-﻿  Main.cpp
+﻿  cBuffer.cpp
+C:\Users\F117\Desktop\Fanshawe\INFO-6016 - Network Programming\Project 1\My Code\INFO-6016_Project 1\INFO-6016_Project 1\cBuffer.cpp(29,23): warning C4244:  '=': conversion from 'short' to '_Ty', possible loss of data
+C:\Users\F117\Desktop\Fanshawe\INFO-6016 - Network Programming\Project 1\My Code\INFO-6016_Project 1\INFO-6016_Project 1\cBuffer.cpp(29,23): warning C4244:         with
+C:\Users\F117\Desktop\Fanshawe\INFO-6016 - Network Programming\Project 1\My Code\INFO-6016_Project 1\INFO-6016_Project 1\cBuffer.cpp(29,23): warning C4244:         [
+C:\Users\F117\Desktop\Fanshawe\INFO-6016 - Network Programming\Project 1\My Code\INFO-6016_Project 1\INFO-6016_Project 1\cBuffer.cpp(29,23): warning C4244:             _Ty=uint8_t
+C:\Users\F117\Desktop\Fanshawe\INFO-6016 - Network Programming\Project 1\My Code\INFO-6016_Project 1\INFO-6016_Project 1\cBuffer.cpp(29,23): warning C4244:         ]
+  Main.cpp
+  Generating Code...
+C:\Users\F117\Desktop\Fanshawe\INFO-6016 - Network Programming\Project 1\My Code\INFO-6016_Project 1\INFO-6016_Project 1\cBuffer.cpp(37,40): warning C4018:  '<': signed/unsigned mismatch
   INFO-6016_Project 1.vcxproj -> C:\Users\F117\Desktop\Fanshawe\INFO-6016 - Network Programming\Project 1\My Code\INFO-6016_Project 1\Debug\INFO-6016_Project 1.exe

@@ -9,12 +9,13 @@
 #include <stdio.h>
 #include <string>
 #include <iostream>
-#include "cBuffer.h"
+//#include "cBuffer.h"
+#include "..//Client/Protocol.h"
 
 // Need to link with Ws2_32.lib
 #pragma comment (lib, "Ws2_32.lib")
 
-#define DEFAULT_BUFLEN 512
+#define DEFAULT_BUFLEN 256
 #define DEFAULT_PORT "5150"
 
 int main(void)
@@ -28,9 +29,9 @@ int main(void)
 	struct addrinfo *addrResult = NULL;
 	struct addrinfo hints;
 
-	int iSendResult;
-	char recvbuf[DEFAULT_BUFLEN];
-	int recvbuflen = DEFAULT_BUFLEN;
+	//int iSendResult;
+	char recvBytes[DEFAULT_BUFLEN];
+	int recvBytesLen = DEFAULT_BUFLEN;
 
 	// Initialize Winsock
 	iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
@@ -149,14 +150,19 @@ int main(void)
 	//} while (iResult > 0);
 
 	// While loop: accept and echo message back to client
-	char buf[4096];
+	ZeroMemory(recvBytes, recvBytesLen);
+	int bytesReceived = recv(ClientSocket, recvBytes, recvBytesLen, 0);
+
+	std::cout << recvMessage(recvBytes, bytesReceived) << std::endl;
+
+	send(ClientSocket, recvBytes, bytesReceived, 0);
 
 	while (true)
 	{
-		ZeroMemory(buf, 4096);
+		ZeroMemory(recvBytes, recvBytesLen);
 
 		// Wait for client to send data
-		int bytesReceived = recv(ClientSocket, buf, 4096, 0);
+		int bytesReceived = recv(ClientSocket, recvBytes, recvBytesLen, 0);
 		if (bytesReceived == SOCKET_ERROR)
 		{
 			std::cerr << "Error in recv(). Quitting" << std::endl;
@@ -168,34 +174,10 @@ int main(void)
 			std::cout << "Client disconnected " << std::endl;
 			break;
 		}
-		cBuffer recvBuffer;
 
-		recvBuffer._buffer.resize(8);
-		recvBuffer._buffer[0] = buf[0];
-		recvBuffer._buffer[1] = buf[1];
-		recvBuffer._buffer[2] = buf[2];
-		recvBuffer._buffer[3] = buf[3];
-		recvBuffer._buffer[4] = buf[4];
-		recvBuffer._buffer[5] = buf[5];
-		recvBuffer._buffer[6] = buf[6];
-		recvBuffer._buffer[7] = buf[7];
-		//std::string stringToBuffer;
-		//stringToBuffer = buf;
-		//recvBuffer._buffer.insert(recvBuffer._buffer.begin(), stringToBuffer.begin(), stringToBuffer.end());
-
-		//recvBuffer.writeStringBE(0, std::string(buf, 0, bytesReceived));
-
-		std::cout << recvBuffer.readUInt32BE(0) << std::endl;
-		std::cout << recvBuffer.readUInt32BE(4) << std::endl;
-		std::cout << std::string(buf, 0, bytesReceived) << std::endl;
-		//std::cout << recvBuffer.readStringBE(0) << std::endl;
-
-		// Echo message back to client
-		//std::string bufferToString;
-		//bufferToString.insert(bufferToString.begin(), recvBuffer._buffer.begin(), recvBuffer._buffer.end());
-		//send(ClientSocket, bufferToString.c_str(), bufferToString.size(), 0);
-		send(ClientSocket, "ok", 2, 0);
-
+		std::cout << recvMessage(recvBytes, bytesReceived) << std::endl;
+		// Echo message back to client				
+		send(ClientSocket, recvBytes, bytesReceived, 0);
 	}
 
 	// shutdown the connection since we're done

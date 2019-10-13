@@ -7,31 +7,24 @@
 #include <stdio.h>
 #include <string>
 #include <iostream>
-#include "cBuffer.h"
-#include "cProtocol.h"
+#include "Protocol.h"
 
 // Need to link with Ws2_32.lib, Mswsock.lib, and Advapi32.lib
 #pragma comment (lib, "Ws2_32.lib")
 
 
-#define DEFAULT_BUFLEN 512
+#define DEFAULT_BYTESLEN 512
 #define DEFAULT_PORT "5150"
 
 int main(int argc, char** argv)
 {
 	WSADATA wsaData;
 	SOCKET ConnectSocket = INVALID_SOCKET;
-	struct addrinfo* result = NULL, * ptr = NULL, hints;
-	const char* sendbuf = "this is a test";
-	char recvbuf[DEFAULT_BUFLEN];
+	struct addrinfo *result = NULL, *ptr = NULL, hints;
+	//const char* sendbuf = "this is a test";
+	char recvBytes[DEFAULT_BYTESLEN];
 	int iResult;
-	int recvbuflen = DEFAULT_BUFLEN;
-
-	// Validate the parameters
-	//if (argc != 2) {
-	//	printf("usage: %s server-name\n", argv[0]);
-	//	return 1;
-	//}
+	int recvBytesLen = DEFAULT_BYTESLEN;
 
 	// Initialize Winsock
 	iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
@@ -104,60 +97,89 @@ int main(int argc, char** argv)
 
 	//printf("Bytes Sent: %ld\n", iResult);
 
-	char buf[4096];
-	std::string userInput;
+	//char buf[4096];
 
-	std::string str;
-	cBuffer Buffer;
-	Buffer = JoinRoom("room#1", "Sen");
-	str.insert(str.begin(), Buffer._buffer.begin(), Buffer._buffer.end());
-	std::cout << Buffer.readUInt32BE(0) << std::endl;
-	std::cout << Buffer.readUInt32BE(4) << std::endl;
-	std::cout << Buffer.readUInt32BE(8) << std::endl;
-	std::cout << Buffer.readUInt32BE(18) << std::endl;
-	iResult = send(ConnectSocket, str.c_str(), str.size(), 0);
+	std::cout << "Please input your name:" << std::endl;
+	std::cout << "> ";
+	std::string nameInput;
+	getline(std::cin, nameInput);
+
+	std::cout << "Please input the room number you would like to join:" << std::endl;
+	std::cout << "1 - room#1" << std::endl;
+	std::cout << "2 - room#2" << std::endl;
+	std::cout << "3 - room#3" << std::endl;
+	std::cout << "> ";
+	int numInput;
+	std::string roomName;
+	std::cin >> numInput;
+	std::cin.ignore();
+	switch (numInput)
+	{
+	case 1:
+		roomName = "room#1";
+		break;
+	case 2:
+		roomName = "room#2";
+		break;
+	case 3:
+		roomName = "room#3";
+		break;
+	default:
+		std::cout << "Invalid input" << "\n";
+		break;
+	}	
+
+	iResult = send(ConnectSocket, joinRoom(roomName, nameInput).c_str(), joinRoom(roomName, nameInput).size(), 0);
+
+	ZeroMemory(recvBytes, recvBytesLen);
+	int bytesReceived = recv(ConnectSocket, recvBytes, recvBytesLen, 0);
+	std::cout << "SERVER> " << recvMessage(recvBytes, bytesReceived) << std::endl;
+
+	std::string messageInput;
 	do
 	{
 		// Prompt the user for some text
-		std::cout << "> ";
-		getline(std::cin, userInput);
+		std::cout << "[" << roomName << "] [" << nameInput << "] "<< "> ";
+		getline(std::cin, messageInput);
 
-		if (userInput.size() > 0)		// Make sure the user has typed in something
-		{
-			//cBuffer sendBuffer;
-			//sendBuffer.writeStringBE(0, userInput);
-			//std::string bufferToString;
-			//bufferToString.insert(bufferToString.begin(), sendBuffer._buffer.begin(), sendBuffer._buffer.end());
-
+		if (messageInput.size() > 0)		// Make sure the user has typed in something
+		{			
+			if (messageInput == "/leave")
+			{
+				iResult = send(ConnectSocket, leaveRoom(roomName, nameInput).c_str(), leaveRoom(roomName, nameInput).size(), 0);
+				break;
+			}
 			// Send the text
-			int sendResult = send(ConnectSocket, userInput.c_str(), userInput.size() + 1, 0);
+			iResult = send(ConnectSocket, sendMessage(roomName, nameInput, messageInput).c_str(),
+				sendMessage(roomName, nameInput, messageInput).size(), 0);
+			//int sendResult = send(ConnectSocket, userInput.c_str(), userInput.size(), 0);
 			//int sendResult = send(ConnectSocket, bufferToString.c_str(), bufferToString.size(), 0);
-			if (sendResult != SOCKET_ERROR)
+			if (iResult != SOCKET_ERROR)
 			{
 				// Wait for response
-				ZeroMemory(buf, 4096);
-				int bytesReceived = recv(ConnectSocket, buf, 4096, 0);
+				ZeroMemory(recvBytes, recvBytesLen);
+				int bytesReceived = recv(ConnectSocket, recvBytes, recvBytesLen, 0);
 				if (bytesReceived > 0)
-				{
-					//cBuffer recvBuffer;
-					//recvBuffer.writeStringBE(0, std::string(buf, 0, bytesReceived));
+				{					
 					// Echo response to console
-					std::cout << "SERVER> " << /*recvBuffer.readStringBE(0) << */std::endl;
+
+					std::cout << "SERVER> " << recvMessage(recvBytes, bytesReceived) << std::endl;
+					//std::cout << "SERVER> " << std::string(recvBytes, 0, bytesReceived) << std::endl;
 				}
 			}
 		}
 
-	} while (userInput.size() > 0);
+	} while (messageInput.size() > 0);
 
 	// shutdown the connection since no more data will be sent
-	//iResult = shutdown(ConnectSocket, SD_SEND);
-	//if (iResult == SOCKET_ERROR) {
-	//	printf("shutdown failed with error: %d\n", WSAGetLastError());
-	//	closesocket(ConnectSocket);
-	//	WSACleanup();
-	//	return 1;
-	//}
-	//printf("Successfully shutdown socket %d!\n", (int)ConnectSocket);
+	iResult = shutdown(ConnectSocket, SD_SEND);
+	if (iResult == SOCKET_ERROR) {
+		printf("shutdown failed with error: %d\n", WSAGetLastError());
+		closesocket(ConnectSocket);
+		WSACleanup();
+		return 1;
+	}
+	printf("Successfully shutdown socket %d!\n", (int)ConnectSocket);
 
 	// Receive until the peer closes the connection
 	//do {

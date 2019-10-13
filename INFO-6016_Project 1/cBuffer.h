@@ -10,12 +10,7 @@ public:
 	std::vector<uint8_t> _buffer;
 	
 	cBuffer();
-	~cBuffer();
-	//cBuffer()
-	//{
-	//	size = 4;
-	//	_buffer.resize(size);
-	//}
+	~cBuffer();	
 
 	void writeInt32BE(std::size_t index, int32_t value);
 
@@ -28,5 +23,5 @@ public:
 
 	short readShortBE(std::size_t index);
 
-	std::string readStringBE(std::size_t index);
+	std::string readStringBE(std::size_t index, int strlen);
 };

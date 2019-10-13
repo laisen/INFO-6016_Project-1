@@ -18,12 +18,15 @@
     <ClCompile Include="serverMain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cBuffer.cpp">
+    <ClCompile Include="..\INFO-6016_Project 1\cBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="cBuffer.h">
+    <ClInclude Include="..\Client\Protocol.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\INFO-6016_Project 1\cBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
