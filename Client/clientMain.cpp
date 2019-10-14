@@ -7,7 +7,12 @@
 #include <stdio.h>
 #include <string>
 #include <iostream>
-#include "Protocol.h"
+#include "..//Buffer/Protocol.h"
+#include <conio.h>
+
+#define ESCAPE 27
+#define DELETE 8
+#define CARRIAGE_RETURN 13
 
 // Need to link with Ws2_32.lib, Mswsock.lib, and Advapi32.lib
 #pragma comment (lib, "Ws2_32.lib")
@@ -84,21 +89,6 @@ int main(int argc, char** argv)
 	}
 	printf("Successfully connected to the server on socket %d!\n", (int)ConnectSocket);
 
-	// Send an initial buffer
-	//printf("Sending a packet to the server...\n");
-	//system("Pause");
-	//iResult = send(ConnectSocket, sendbuf, (int)strlen(sendbuf), 0);
-	//if (iResult == SOCKET_ERROR) {
-	//	printf("send failed with error: %d\n", WSAGetLastError());
-	//	closesocket(ConnectSocket);
-	//	WSACleanup();
-	//	return 1;
-	//}
-
-	//printf("Bytes Sent: %ld\n", iResult);
-
-	//char buf[4096];
-
 	std::cout << "Please input your name:" << std::endl;
 	std::cout << "> ";
 	std::string nameInput;
@@ -129,47 +119,82 @@ int main(int argc, char** argv)
 		break;
 	}	
 
-	iResult = send(ConnectSocket, joinRoom(roomName, nameInput).c_str(), joinRoom(roomName, nameInput).size(), 0);
+	send(ConnectSocket, joinRoom(roomName, nameInput).c_str(), joinRoom(roomName, nameInput).size(), 0);
 
-	ZeroMemory(recvBytes, recvBytesLen);
+	//ZeroMemory(recvBytes, recvBytesLen);
 	int bytesReceived = recv(ConnectSocket, recvBytes, recvBytesLen, 0);
-	std::cout << "SERVER> " << recvMessage(recvBytes, bytesReceived) << std::endl;
+	std::cout << recvMessage(recvBytes, bytesReceived) << std::endl;
 
+	std::cout << "[" << roomName << "] [" << nameInput << "] " << "> ";
 	std::string messageInput;
 	do
 	{
 		// Prompt the user for some text
-		std::cout << "[" << roomName << "] [" << nameInput << "] "<< "> ";
-		getline(std::cin, messageInput);
+		//std::cout << "[" << roomName << "] [" << nameInput << "] "<< "> ";
+		//getline(std::cin, messageInput);
 
-		if (messageInput.size() > 0)		// Make sure the user has typed in something
-		{			
-			if (messageInput == "/leave")
+		int bytesReceived = recv(ConnectSocket, recvBytes, recvBytesLen, 0);
+		if (bytesReceived > 0)
+		{					
+			// Echo response to console
+			std::cout << recvMessage(recvBytes, bytesReceived) << std::endl;
+		}
+
+		if (_kbhit())
+		{
+			char ch = _getch();
+			if (ch == DELETE)
+			{
+				messageInput.pop_back();
+				printf("\b \b");
+			}
+			else
+			{
+				messageInput.push_back(ch);
+				printf("%c", ch);
+			}
+
+
+			if (ch == CARRIAGE_RETURN)
+			{
+				iResult = send(ConnectSocket, sendMessage(roomName, nameInput, messageInput).c_str(),
+					sendMessage(roomName, nameInput, messageInput).size(), 0);
+				messageInput.clear();
+				printf("\n");
+				std::cout << "[" << roomName << "] [" << nameInput << "] " << "> ";
+			}
+
+			if (ch == ESCAPE)
 			{
 				iResult = send(ConnectSocket, leaveRoom(roomName, nameInput).c_str(), leaveRoom(roomName, nameInput).size(), 0);
 				break;
 			}
-			// Send the text
-			iResult = send(ConnectSocket, sendMessage(roomName, nameInput, messageInput).c_str(),
-				sendMessage(roomName, nameInput, messageInput).size(), 0);
-			//int sendResult = send(ConnectSocket, userInput.c_str(), userInput.size(), 0);
-			//int sendResult = send(ConnectSocket, bufferToString.c_str(), bufferToString.size(), 0);
-			if (iResult != SOCKET_ERROR)
-			{
-				// Wait for response
-				ZeroMemory(recvBytes, recvBytesLen);
-				int bytesReceived = recv(ConnectSocket, recvBytes, recvBytesLen, 0);
-				if (bytesReceived > 0)
-				{					
-					// Echo response to console
-
-					std::cout << "SERVER> " << recvMessage(recvBytes, bytesReceived) << std::endl;
-					//std::cout << "SERVER> " << std::string(recvBytes, 0, bytesReceived) << std::endl;
-				}
-			}
 		}
 
-	} while (messageInput.size() > 0);
+		//if (messageInput.size() > 0)		// Make sure the user has typed in something
+		//{			
+		//	if (messageInput == "/leave")
+		//	{
+		//		iResult = send(ConnectSocket, leaveRoom(roomName, nameInput).c_str(), leaveRoom(roomName, nameInput).size(), 0);
+		//		break;
+		//	}
+		//	// Send the text
+		//	iResult = send(ConnectSocket, sendMessage(roomName, nameInput, messageInput).c_str(),
+		//		sendMessage(roomName, nameInput, messageInput).size(), 0);
+		//	//if (iResult != SOCKET_ERROR)
+		//	//{
+		//	//	// Wait for response
+		//	//	ZeroMemory(recvBytes, recvBytesLen);
+		//	//	int bytesReceived = recv(ConnectSocket, recvBytes, recvBytesLen, 0);
+		//	//	if (bytesReceived > 0)
+		//	//	{					
+		//	//		// Echo response to console
+		//	//		std::cout << recvMessage(recvBytes, bytesReceived) << std::endl;
+		//	//	}
+		//	//}
+		//}
+
+	} while (messageInput.size() >= 0);
 
 	// shutdown the connection since no more data will be sent
 	iResult = shutdown(ConnectSocket, SD_SEND);
@@ -179,25 +204,11 @@ int main(int argc, char** argv)
 		WSACleanup();
 		return 1;
 	}
-	printf("Successfully shutdown socket %d!\n", (int)ConnectSocket);
-
-	// Receive until the peer closes the connection
-	//do {
-	//	printf("Waiting to receive data from the server...\n");
-	//	system("Pause");
-	//	iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
-	//	if (iResult > 0)
-	//		printf("Bytes received: %d\n", iResult);
-	//	else if (iResult == 0)
-	//		printf("Connection closed\n");
-	//	else
-	//		printf("recv failed with error: %d\n", WSAGetLastError());
-
-	//} while (iResult > 0);
+	printf("\nSSuccessfully shutdown socket %d!\n", (int)ConnectSocket);
 
 	// cleanup
 	closesocket(ConnectSocket);
 	WSACleanup();
-
+	system("Pause");
 	return 0;
 }

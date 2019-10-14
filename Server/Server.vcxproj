@@ -123,12 +123,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\INFO-6016_Project 1\cBuffer.cpp" />
+    <ClCompile Include="..\Buffer\cBuffer.cpp" />
     <ClCompile Include="serverMain.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Client\Protocol.h" />
-    <ClInclude Include="..\INFO-6016_Project 1\cBuffer.h" />
+    <ClInclude Include="..\Buffer\cBuffer.h" />
+    <ClInclude Include="..\Buffer\Protocol.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

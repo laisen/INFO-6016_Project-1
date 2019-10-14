@@ -1,11 +1,12 @@
 ﻿  cBuffer.cpp
-C:\Users\F117\Desktop\Fanshawe\INFO-6016 - Network Programming\Project 1\My Code\INFO-6016_Project 1\INFO-6016_Project 1\cBuffer.cpp(29,23): warning C4244:  '=': conversion from 'short' to '_Ty', possible loss of data
-C:\Users\F117\Desktop\Fanshawe\INFO-6016 - Network Programming\Project 1\My Code\INFO-6016_Project 1\INFO-6016_Project 1\cBuffer.cpp(29,23): warning C4244:         with
-C:\Users\F117\Desktop\Fanshawe\INFO-6016 - Network Programming\Project 1\My Code\INFO-6016_Project 1\INFO-6016_Project 1\cBuffer.cpp(29,23): warning C4244:         [
-C:\Users\F117\Desktop\Fanshawe\INFO-6016 - Network Programming\Project 1\My Code\INFO-6016_Project 1\INFO-6016_Project 1\cBuffer.cpp(29,23): warning C4244:             _Ty=uint8_t
-C:\Users\F117\Desktop\Fanshawe\INFO-6016 - Network Programming\Project 1\My Code\INFO-6016_Project 1\INFO-6016_Project 1\cBuffer.cpp(29,23): warning C4244:         ]
+C:\Users\F117\Desktop\Fanshawe\INFO-6016 - Network Programming\Project 1\My Code\INFO-6016_Project 1\Buffer\cBuffer.cpp(29,23): warning C4244:  '=': conversion from 'short' to '_Ty', possible loss of data
+C:\Users\F117\Desktop\Fanshawe\INFO-6016 - Network Programming\Project 1\My Code\INFO-6016_Project 1\Buffer\cBuffer.cpp(29,23): warning C4244:         with
+C:\Users\F117\Desktop\Fanshawe\INFO-6016 - Network Programming\Project 1\My Code\INFO-6016_Project 1\Buffer\cBuffer.cpp(29,23): warning C4244:         [
+C:\Users\F117\Desktop\Fanshawe\INFO-6016 - Network Programming\Project 1\My Code\INFO-6016_Project 1\Buffer\cBuffer.cpp(29,23): warning C4244:             _Ty=uint8_t
+C:\Users\F117\Desktop\Fanshawe\INFO-6016 - Network Programming\Project 1\My Code\INFO-6016_Project 1\Buffer\cBuffer.cpp(29,23): warning C4244:         ]
   serverMain.cpp
-C:\Users\F117\Desktop\Fanshawe\INFO-6016 - Network Programming\Project 1\My Code\INFO-6016_Project 1\INFO-6016_Project 1\cBuffer.cpp(37,40): warning C4018:  '<': signed/unsigned mismatch
+C:\Users\F117\Desktop\Fanshawe\INFO-6016 - Network Programming\Project 1\My Code\INFO-6016_Project 1\Buffer\cBuffer.cpp(37,40): warning C4018:  '<': signed/unsigned mismatch
+C:\Users\F117\Desktop\Fanshawe\INFO-6016 - Network Programming\Project 1\My Code\INFO-6016_Project 1\Buffer\Protocol.h(176,23): warning C4018:  '<': signed/unsigned mismatch
   Generating Code...
-C:\Users\F117\Desktop\Fanshawe\INFO-6016 - Network Programming\Project 1\My Code\INFO-6016_Project 1\Client\Protocol.h(176,23): warning C4018:  '<': signed/unsigned mismatch
+C:\Users\F117\Desktop\Fanshawe\INFO-6016 - Network Programming\Project 1\My Code\INFO-6016_Project 1\Server\serverMain.cpp(151,8): warning C4101:  'flags': unreferenced local variable
   Server.vcxproj -> C:\Users\F117\Desktop\Fanshawe\INFO-6016 - Network Programming\Project 1\My Code\INFO-6016_Project 1\Debug\Server.exe
