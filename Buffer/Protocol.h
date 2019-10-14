@@ -170,15 +170,13 @@ std::string leaveRoom(std::string roomName, std::string clientName)
 
 std::string recvMessage(char recvBytes[], int bytesReceived)
 {
-	cBuffer buffer;
-	//buffer._buffer.insert(buffer._buffer.begin(), bytesToString.begin(), bytesToString.end());
+	cBuffer buffer;	
 	buffer._buffer.resize(bytesReceived);
 	for (size_t i = 0; i < bytesReceived; i++)
 	{
 		buffer._buffer[i] = recvBytes[i];
 	}
-
-	//packet_length = buffer.readUInt32BE(0);
+	
 	packet_length = bytesReceived;
 
 	message_type = buffer.readUInt32BE(sizeof(packet_length));
@@ -194,36 +192,36 @@ std::string recvMessage(char recvBytes[], int bytesReceived)
 		+ sizeof(message_type)
 		+ sizeof(room_length), room_length);
 
-	std::string clientName = buffer.readStringBE(sizeof(packet_length) //4
-		+ sizeof(message_type) //4
-		+ sizeof(room_length) //4
-		+ room_length //room#1 6
-		+ sizeof(client_length), client_length); //4
+	std::string clientName = buffer.readStringBE(sizeof(packet_length)
+		+ sizeof(message_type)
+		+ sizeof(room_length)
+		+ room_length
+		+ sizeof(client_length), client_length);
 
 	if (message_type == MESSAGE_ID_JOIN_ROOM)
 	{
 		std::ostringstream outString;
-		outString << "Welcome " << clientName << " joins " << roomName << "! (Press ESC to leave room)";		
+		outString << "Welcome " << clientName << " joins " << roomName << "! (Input /leave to exit)";		
 
 		return outString.str();
 	}
 
 	if (message_type == MESSAGE_ID_SEND)
 	{
-		message_length = buffer.readUInt32BE(sizeof(packet_length) //4
-			+ sizeof(message_type) //4
-			+ sizeof(room_length) //4
-			+ room_length //room#1 6
-			+ sizeof(client_length) //4
-			+ client_length); //Sen 3
+		message_length = buffer.readUInt32BE(sizeof(packet_length)
+			+ sizeof(message_type)
+			+ sizeof(room_length)
+			+ room_length
+			+ sizeof(client_length)
+			+ client_length);
 
-		std::string message = buffer.readStringBE(sizeof(packet_length) //4
-			+ sizeof(message_type) //4
-			+ sizeof(room_length) //4
-			+ room_length //room#1 6
-			+ sizeof(client_length) //4
-			+ client_length //sen 3
-			+ sizeof(message_length), message_length); //4
+		std::string message = buffer.readStringBE(sizeof(packet_length)
+			+ sizeof(message_type) 
+			+ sizeof(room_length)
+			+ room_length
+			+ sizeof(client_length) 
+			+ client_length
+			+ sizeof(message_length), message_length);
 
 		std::ostringstream outString;
 		outString << "[" << roomName << "] [" << clientName << "]: " << message;
@@ -241,5 +239,3 @@ std::string recvMessage(char recvBytes[], int bytesReceived)
 
 	return "unknown message";
 }
-
-//  0123  4567  89/10/11  12/13/14/15/16/17  18/19/20/21  22/23/24  25/26/27/28  29_message

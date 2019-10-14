@@ -8,25 +8,18 @@
 #include <string>
 #include <iostream>
 #include "..//Buffer/Protocol.h"
-#include <conio.h>
 
-#define ESCAPE 27
-#define DELETE 8
-#define CARRIAGE_RETURN 13
-
-// Need to link with Ws2_32.lib, Mswsock.lib, and Advapi32.lib
 #pragma comment (lib, "Ws2_32.lib")
 
 
 #define DEFAULT_BYTESLEN 512
-#define DEFAULT_PORT "5150"
+#define DEFAULT_PORT "1234"
 
 int main(int argc, char** argv)
 {
 	WSADATA wsaData;
 	SOCKET ConnectSocket = INVALID_SOCKET;
-	struct addrinfo *result = NULL, *ptr = NULL, hints;
-	//const char* sendbuf = "this is a test";
+	struct addrinfo *result = NULL, *ptr = NULL, hints;	
 	char recvBytes[DEFAULT_BYTESLEN];
 	int iResult;
 	int recvBytesLen = DEFAULT_BYTESLEN;
@@ -120,83 +113,27 @@ int main(int argc, char** argv)
 	}	
 
 	send(ConnectSocket, joinRoom(roomName, nameInput).c_str(), joinRoom(roomName, nameInput).size(), 0);
-
-	//ZeroMemory(recvBytes, recvBytesLen);
+	
 	int bytesReceived = recv(ConnectSocket, recvBytes, recvBytesLen, 0);
 	std::cout << recvMessage(recvBytes, bytesReceived) << std::endl;
-
-	std::cout << "[" << roomName << "] [" << nameInput << "] " << "> ";
+		
 	std::string messageInput;
-	do
-	{
-		// Prompt the user for some text
-		//std::cout << "[" << roomName << "] [" << nameInput << "] "<< "> ";
-		//getline(std::cin, messageInput);
-
-		int bytesReceived = recv(ConnectSocket, recvBytes, recvBytesLen, 0);
-		if (bytesReceived > 0)
-		{					
-			// Echo response to console
-			std::cout << recvMessage(recvBytes, bytesReceived) << std::endl;
-		}
-
-		if (_kbhit())
+	while (true)
+	{	
+		std::cout << "[" << roomName << "] [" << nameInput << "]> ";
+		getline(std::cin, messageInput);
+		if (messageInput == "/leave")
 		{
-			char ch = _getch();
-			if (ch == DELETE)
-			{
-				messageInput.pop_back();
-				printf("\b \b");
-			}
-			else
-			{
-				messageInput.push_back(ch);
-				printf("%c", ch);
-			}
-
-
-			if (ch == CARRIAGE_RETURN)
-			{
-				iResult = send(ConnectSocket, sendMessage(roomName, nameInput, messageInput).c_str(),
-					sendMessage(roomName, nameInput, messageInput).size(), 0);
-				messageInput.clear();
-				printf("\n");
-				std::cout << "[" << roomName << "] [" << nameInput << "] " << "> ";
-			}
-
-			if (ch == ESCAPE)
-			{
-				iResult = send(ConnectSocket, leaveRoom(roomName, nameInput).c_str(), leaveRoom(roomName, nameInput).size(), 0);
-				break;
-			}
+			send(ConnectSocket, leaveRoom(roomName, nameInput).c_str(), leaveRoom(roomName, nameInput).size(), 0);
+			std::cout << recvMessage(recvBytes, bytesReceived) << std::endl;
+			break;
 		}
-
-		//if (messageInput.size() > 0)		// Make sure the user has typed in something
-		//{			
-		//	if (messageInput == "/leave")
-		//	{
-		//		iResult = send(ConnectSocket, leaveRoom(roomName, nameInput).c_str(), leaveRoom(roomName, nameInput).size(), 0);
-		//		break;
-		//	}
-		//	// Send the text
-		//	iResult = send(ConnectSocket, sendMessage(roomName, nameInput, messageInput).c_str(),
-		//		sendMessage(roomName, nameInput, messageInput).size(), 0);
-		//	//if (iResult != SOCKET_ERROR)
-		//	//{
-		//	//	// Wait for response
-		//	//	ZeroMemory(recvBytes, recvBytesLen);
-		//	//	int bytesReceived = recv(ConnectSocket, recvBytes, recvBytesLen, 0);
-		//	//	if (bytesReceived > 0)
-		//	//	{					
-		//	//		// Echo response to console
-		//	//		std::cout << recvMessage(recvBytes, bytesReceived) << std::endl;
-		//	//	}
-		//	//}
-		//}
-
-	} while (messageInput.size() >= 0);
-
-	// shutdown the connection since no more data will be sent
+		send(ConnectSocket, sendMessage(roomName, nameInput, messageInput).c_str(),
+			sendMessage(roomName, nameInput, messageInput).size(), 0);
+		int bytesReceived = recv(ConnectSocket, recvBytes, recvBytesLen, 0);
+		std::cout << recvMessage(recvBytes, bytesReceived) << std::endl;
+	}
+		
 	iResult = shutdown(ConnectSocket, SD_SEND);
 	if (iResult == SOCKET_ERROR) {
 		printf("shutdown failed with error: %d\n", WSAGetLastError());
@@ -204,7 +141,7 @@ int main(int argc, char** argv)
 		WSACleanup();
 		return 1;
 	}
-	printf("\nSSuccessfully shutdown socket %d!\n", (int)ConnectSocket);
+	printf("Successfully shutdown socket %d!\n", (int)ConnectSocket);
 
 	// cleanup
 	closesocket(ConnectSocket);
